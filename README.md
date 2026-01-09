@@ -101,7 +101,7 @@ CHANNEL_INPUT = {
 
 ```python
 # 彎曲狀態角度
-FINGER_ANGLES_BENT = {
+ANGLES_BENT = {
     "thumb": x,
     "index": x,
     "middle": x,
@@ -110,7 +110,7 @@ FINGER_ANGLES_BENT = {
 }
 
 # 伸直狀態角度
-FINGER_ANGLES_STRAIGHT = {
+ANGLES_STRAIGHT = {
     "thumb": x,
     "index": x,
     "middle": x,
