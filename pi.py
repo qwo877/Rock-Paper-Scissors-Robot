@@ -26,7 +26,7 @@ INVERT_FINGER = {
     "pinky": False
 }
 
-FINGER_ANGLES_BENT = {
+ANGLES_BENT = {
     "thumb": 0,
     "index": 0,
     "middle": 0,
@@ -34,7 +34,7 @@ FINGER_ANGLES_BENT = {
     "pinky": 0
 }
 
-FINGER_ANGLES_STRAIGHT = {
+ANGLES_STRAIGHT = {
     "thumb": 90,
     "index": 90,
     "middle": 120,
@@ -42,7 +42,7 @@ FINGER_ANGLES_STRAIGHT = {
     "pinky": 120
 }
 
-SERVO_CHANNELS_TOTAL = 16
+CHANNELS = 16
 
 # -------------------------------------------------
 
@@ -52,20 +52,20 @@ servo_lock = threading.Lock()
 def init_servos():
     global kit
     try:
-        kit = ServoKit(channels=SERVO_CHANNELS_TOTAL)
+        kit = ServoKit(channels=CHANNELS)
         print("[Servo] ServoKit 初始化完成")
     except Exception as e:
         print(f"[Servo] ServoKit 初始化失敗，改為模擬模式: {e}")
         kit = None
 
-def user_channel_to_kit_channel(user_ch):
+def uc_to_kc(user_ch):
     """把使用者給的 1-based channel 轉為 0-based 並驗證範圍"""
     if user_ch is None:
         return None
     try:
         ch = int(user_ch)
-        if ch < 0 or ch >= SERVO_CHANNELS_TOTAL:
-            print(f"[Servo] 警告：通道 {user_ch} 越界 (0..{SERVO_CHANNELS_TOTAL-1})")
+        if ch < 0 or ch >= CHANNELS:
+            print(f"[Servo] 警告：通道 {user_ch} 越界 (0..{CHANNELS-1})")
         return ch
     except:
         return None
@@ -89,7 +89,7 @@ def set_servo_angle_raw(ch, angle):
 
 def set_finger_angle(finger, angle):
     user_ch = CHANNEL_INPUT.get(finger)
-    ch = user_channel_to_kit_channel(user_ch)
+    ch = uc_to_kc(user_ch)
     if ch is None:
         print(f"[Servo] 找不到 finger {finger} 的 channel")
         return
@@ -97,32 +97,32 @@ def set_finger_angle(finger, angle):
         angle = 180 - angle
     set_servo_angle_raw(ch, angle)
 
-def control_hand(esp_move):
-    if esp_move == "rock":
+def control_hand(pi_move):
+    if pi_move == "rock":
         states = {f: "bent" for f in CHANNEL_INPUT.keys()}
-    elif esp_move == "paper":
+    elif pi_move == "paper":
         states = {f: "straight" for f in CHANNEL_INPUT.keys()}
-    elif esp_move == "scissors":
+    elif pi_move == "scissors":
         states = {f: "bent" for f in CHANNEL_INPUT.keys()}
         states["index"] = "straight"
         states["middle"] = "straight"
     else:
-        print(f"[Servo] 未知手勢: {esp_move}")
+        print(f"[Servo] 未知手勢: {pi_move}")
         return
 
     # 送出命令（加鎖）
     with servo_lock:
         for finger, state in states.items():
             if state == "straight":
-                angle = FINGER_ANGLES_STRAIGHT.get(finger)
+                angle = ANGLES_STRAIGHT.get(finger)
             else:
-                angle = FINGER_ANGLES_BENT.get(finger)
+                angle = ANGLES_BENT.get(finger)
             print(f"[Servo] ({finger}) -> {state} -> 角度 {angle} (invert={INVERT_FINGER.get(finger)})")
             set_finger_angle(finger, angle)
             time.sleep(0.04)
 
 # --------------------- SocketIO / Camera / Main logic ---------------------
-SERVER_URL = 'http://xxx.xxx.xxx.xxx:5000'
+SERVER_URL = 'http://10.73.10.66:5000'
 SUBMIT_ENDPOINT = f"{SERVER_URL}/submit"
 
 is_processing = False
@@ -246,4 +246,3 @@ if __name__ == "__main__":
     parser.add_argument("--calibrate", action="store_true", help="執行伺服校正序列（paper/rock/scissors）")
     args = parser.parse_args()
     main(args)
-

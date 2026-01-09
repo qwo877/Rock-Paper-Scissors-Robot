@@ -87,11 +87,11 @@ def closest(fingers):
             
     return best_match
 
-def win(player, esp):
+def win(player, pi):
     if player == "none": return "no_player_detected"
-    if player == esp: return "draw"
+    if player == pi: return "draw"
     beats = {"rock": "scissors", "scissors": "paper", "paper": "rock"}
-    return "win" if beats[player] == esp else "lose"
+    return "win" if beats[player] == pi else "lose"
 
 # ---------- 影像處理與存檔 ----------
 
