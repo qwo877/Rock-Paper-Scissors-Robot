@@ -122,7 +122,7 @@ def control_hand(esp_move):
             time.sleep(0.04)
 
 # --------------------- SocketIO / Camera / Main logic ---------------------
-SERVER_URL = 'http://10.73.10.66:5000'
+SERVER_URL = 'http://xxx.xxx.xxx.xxx:5000'
 SUBMIT_ENDPOINT = f"{SERVER_URL}/submit"
 
 is_processing = False
@@ -246,3 +246,4 @@ if __name__ == "__main__":
     parser.add_argument("--calibrate", action="store_true", help="執行伺服校正序列（paper/rock/scissors）")
     args = parser.parse_args()
     main(args)
+
